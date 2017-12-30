@@ -8,10 +8,11 @@ library(tidyverse)
 data <- readRDS("processed/data2.RDS")
 
 # The races were...
-races <- c(10, 10, 34:37, 47, 62, 106, 109, 121:123, 128, 149, 153, 164, 183, 189, 207, 226)
-marathons <- c(10, 109, 183)
-halfathon <- c(226, 207, 149, 128, 153)
-fiveks <- c(19, 47, 62, 189, 164)
+races <- c(7, 10, 35:37, 47, 64, 102, 106, 109, 121:123, 128, 141,
+           149, 159, 183, 189, 208, 226)
+marathons <- c(10, 102, 109, 183)
+halfathon <- c(226, 208, 141, 149, 128)
+fiveks <- c(7, 19, 47, 64, 189)
 other_race <- races[which(!(races %in% c(marathons, halfathon, fiveks)))]
 data <- data %>% mutate(runtype = ifelse(id %in% races, "Race", "Run")) %>%
   mutate(runtype = ifelse(id %in% marathons, "Marathon", runtype)) %>%

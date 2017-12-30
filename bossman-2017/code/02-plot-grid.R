@@ -34,7 +34,7 @@ p <- ggplot(data) +
   geom_path(aes(lon, lat, group = id, alpha = emph, size = emph, color = as.factor(data$runtype)), lineend = "round") +
   facet_wrap(~id, scales = "free", ncol = 15) +
   theme_blankcanvas(margin_cm = 1) + ggtitle("Runs of 2017")  + 
-  theme(panel.spacing = unit(2, "lines"), legend.position = "bottom", 
+  theme(panel.spacing = unit(1.5, "lines"), legend.position = "bottom", 
         strip.background=element_rect(linetype = 1),
         legend.title = element_blank(), legend.text=element_text(size=25), 
         legend.key = element_blank(), legend.key.width = unit(3, "cm"),
@@ -44,9 +44,59 @@ p <- ggplot(data) +
   scale_alpha(guide = FALSE, range = c(.75, 1)) +
   guides(colour = guide_legend(override.aes = list(size=4))) 
 
-# Save plot
-dir.create("plots")
-ggsave("plots/facets003.pdf", p, width = 22, height = 22, units = "in")
-ggsave("plots/facets002.png", p, width = 22, height = 22, units = "in")
 
 
+
+# Trying to make it different.... ---------
+height_per_row <- 24/17
+
+
+# The early part of 2017, in Houston
+p1 <-  ggplot(data %>% filter(id < 69)) +
+  geom_path(aes(lon, lat, group = id, size = emph, color = runtype), lineend = "round") +
+  facet_wrap(~id, scales = "free", ncol = 15) +
+  theme_blankcanvas(margin_cm = 1) + # ggtitle("Runs of 2017")  + 
+  theme(panel.spacing = unit(1.5, "lines"), legend.position = "bottom", 
+        strip.background=element_rect(linetype = 1),
+        legend.title = element_blank(), legend.text=element_text(size=25), 
+        legend.key = element_blank(), legend.key.width = unit(3, "cm"),
+        plot.title = element_text(hjust = .5, size = 40, margin = margin(b = 1, unit = "cm")),
+        plot.margin=unit(c(1,1,1,1),"cm")) + 
+  scale_colour_manual(values=c("#AA3939","#116611", "#0D4D4D", "black"), guide = F) + 
+  scale_size(guide = FALSE, range = c(.25,2.5), limits = c(0,1)) + xlab("test") 
+ggsave("plots/part1.png", p1, width = 22, height = height_per_row*6, units = 'in')
+
+# Lots of runs during the drive from Texas to Washington!
+p2 <- ggplot(data %>% filter(id %in% 69:83 )) +
+  geom_path(aes(lon, lat, group = id,  size = emph, color = runtype), 
+            data = data %>% filter(id %in% 69:77), lineend = "round") +
+  facet_wrap(~id, scales = "free", ncol = 15, drop = FALSE) +
+  theme_blankcanvas(margin_cm = 1) +
+  theme(panel.spacing = unit(1.5, "lines"), legend.position = "bottom", 
+        strip.background=element_rect(linetype = 1),
+        legend.title = element_blank(), legend.text=element_text(size=25), 
+        legend.key = element_blank(), legend.key.width = unit(3, "cm"),
+        plot.title = element_text(hjust = .5, size = 40, margin = margin(b = 1, unit = "cm")),
+        plot.margin=unit(c(1,1,1,1),"cm")) + 
+  scale_colour_manual(values=c("black"), guide = F) + ylab("TEST!") +
+  scale_size(guide = FALSE, range = c(.25,2.5), limits = c(0,1)) + xlab("test") 
+ggsave("plots/part2.png",p2, width = 22, height = height_per_row*1, units = 'in')
+
+# Running in the Pacific Northwest. Lots of hikes happened during this time that didn't make it on this grid!
+p3 <- ggplot(data %>% filter(id>77 )) +
+  geom_path(aes(lon, lat, group = id,  size = emph, color = runtype), lineend = "round") +
+  facet_wrap(~id, scales = "free", ncol = 15, drop = FALSE) +
+  theme_blankcanvas(margin_cm = 1) + labs(caption = "2017") +
+  theme(panel.spacing = unit(1.5, "lines"), legend.position = "bottom", 
+        strip.background=element_rect(linetype = 1),
+        legend.title = element_blank(), legend.text=element_text(size=25), 
+        legend.margin=margin(5,0,0,0), legend.box.margin=margin(40,0,0,0),
+        legend.key = element_blank(), legend.key.width = unit(3, "cm"),
+        plot.title = element_text(hjust = .5, size = 40, margin = margin(b = 1, unit = "cm")),
+        plot.margin=unit(c(1,1,1,1),"cm"), plot.caption = element_text(face = "bold.italic", size = 25)) + 
+  scale_colour_manual(values=c("#AA3939","#04859D","#00741F", "#FF7D01", "black"),
+                      breaks = c ("Marathon","Half Marathon", "5K" , "Other Race")) + 
+  scale_size(guide = FALSE, range = c(.25,2.5), limits = c(0,1)) + 
+  guides(colour = guide_legend(override.aes = list(size=4)))
+ggsave("plots/part3.png",p3, width = 22, height = height_per_row*11, units = 'in')
+system("convert -append plots/part1.png plots/part2.png plots/part3.png plots/combined.png")
